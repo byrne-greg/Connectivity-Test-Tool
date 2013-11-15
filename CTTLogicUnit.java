@@ -39,9 +39,14 @@ public class CTTLogicUnit
 
 	private String hostAddress;
 	private ArrayList<Integer> pingAverages;
+	
+	private boolean debugEnabled;
+	private String debugLine;
+	
 	protected static final int NO_RESPONSE = 9999;
 
 //***** Constructors
+	
 	/**
 	 * 
 	 */
@@ -88,8 +93,9 @@ public class CTTLogicUnit
 			while ((command = stdInput.readLine()) != null)
 			{	// open WHILE
 				
-				//TODO DEBUG ONLY - will print ping execution to command line
-				//System.out.println(command);
+				// check for debug mode and return input to GUI
+				if(debugEnabled == true)
+					setDebugLine(command);
 				
 				// filter for command line that contains "Average =" and perform array logic
 				if(command.contains("Average ="))
@@ -225,6 +231,49 @@ public class CTTLogicUnit
 		return hostAddress;
 		
 	}	// close getPingAverages()
+	
+	/**
+	 * 
+	 * @param newDebugEnabled
+	 */
+	public void setDebugEnabled(boolean newDebugEnabled)
+	{	// open setDebugEnabled()
+		
+		this.debugEnabled = newDebugEnabled;
+		
+	}	// close setDebugEnabled()
+	
+	/**
+	 * 
+	 * @return debugEnabled
+	 */
+	public boolean getDebugEnabled()
+	{	// open getDebugEnabled()
+		
+		return debugEnabled;
+		
+	}	// close getDebugEnabled()
+	
+	/**
+	 * 
+	 * @param newDebugLine
+	 */
+	public void setDebugLine(String newDebugLine)
+	{	// open setDebugLine()
+		
+		this.debugLine = newDebugLine;
+		
+	}	// close setDebugLine()
+	/**
+	 * 
+	 * @return debugLine
+	 */
+	public String getDebugOutput()
+	{	// open getDebugOutput()
+		
+		return debugLine;
+		
+	}	// close getDebugOutput()
 	
 	/**
 	 * @return details

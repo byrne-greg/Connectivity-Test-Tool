@@ -27,13 +27,20 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -49,16 +56,22 @@ public class CTTGui
 
 //***** Instance Variables
 	
+	private String versionID = "1.2";
+	
 	private JFrame window;
 	private JTextField enterAddressTF;
+	private JTextArea debugOutputTA;
+	private JCheckBox debugCB;
+	private ArrayList<String> debugOutputsToAppend;
 	private JButton startPingButton;
 	private JButton stopPingButton;
 	private JLabel statusLabel;
+	private JPanel controlPanel;
 	private JPanel resultPanel;
+	private static Color defaultColor;
 	private CTTLogicUnit cttLogicUnit;
 	private CTTLogicUnitGuiThread cttGuiThread;
-	private static Color defaultColor;
-
+	
 //***** Constructor
 	
 	@SuppressWarnings("unused")
@@ -91,7 +104,7 @@ public class CTTGui
 		{	// open JFrameStart label
 		
 			window = new JFrame();
-			window.setTitle("Connectivity Test Tool by Greg Byrne (Oct 2013) - byrne.greg@gmail.com");
+			window.setTitle("Connectivity Test Tool");
 			window.setLayout(new BorderLayout() );
 			
 			Icon:
@@ -180,6 +193,24 @@ public class CTTGui
 		
 		}	// close JLabel label
 		
+		JTextArea:
+		{	// open JTextArea label
+			
+			debugOutputTA = new JTextArea();
+			debugOutputTA.setEditable(false);
+			debugOutputTA.setLineWrap(true);
+			debugOutputTA.setWrapStyleWord(true); // wrap to words (not char)
+			debugOutputTA.setBorder(new TitledBorder("Debug Output from Console") );
+			
+			Dimension dotaDim = new Dimension(475, 125);
+			debugOutputTA.setMinimumSize(dotaDim);
+			debugOutputTA.setPreferredSize(dotaDim);
+			
+			// enable ArrayList for debugOutputs
+			debugOutputsToAppend = new ArrayList<>();
+			
+		}	// close JTextArea label
+		
 		JPanel:
 		{	// open JPanel label
 					
@@ -205,7 +236,7 @@ public class CTTGui
 			resultPanel.setPreferredSize(resultPanelDim);
 			resultPanel.add(statusLabel);
 			
-			JPanel controlPanel = new JPanel();
+			controlPanel = new JPanel();
 			controlPanel.add(textFieldPanel);
 			controlPanel.add(buttonPanel);
 			controlPanel.add(resultPanel);
@@ -216,11 +247,78 @@ public class CTTGui
 			defaultColor = resultPanel.getBackground();
 			
 		}	// close JPanel label
+		
+		MenuBar:
+		{	// open MenuBar label]
+			
+			// create menu
+			// JMenuBar menuBar
+			JMenuBar menuBar = new JMenuBar();
+			// JMenu helpMenu
+			JMenu helpMenu = new JMenu("Help");
+			// JMenuItem aboutMI
+			JMenuItem aboutMI = new JMenuItem("About");
+			// JCheckBox debugCB
+			debugCB = new JCheckBox("Show Debug Output");
+			
+			//	add to appropriate menu listings
+			helpMenu.add(debugCB);
+			helpMenu.add(aboutMI);
+			menuBar.add(helpMenu);
+			
+			//	addActionListener for aboutMI
+			aboutMI.addActionListener(new ActionListener()
+			{	// open ACTIONLISTENER CLASS
+
+				@Override
+				public void actionPerformed(ActionEvent ae) 
+				{	// open
+					
+					JOptionPane.showMessageDialog(null, "Created by Greg Byrne, October 2013\nEmail: byrne.greg@gmail.com\nVersion: " + versionID);
+					
+				}	// close	
+				
+			});		// close ACTIONLISTENER CLASS
+			
+			// addActionListener for debugCB
+			debugCB.addActionListener(new ActionListener()
+			{	// open ACTIONLISENER CLASS
+				
+				@Override
+				public void actionPerformed(ActionEvent ae)
+				{	// open
+					
+					// if debug check box is checked
+					if(debugCB.isSelected())
+					{	// open IF
+						
+						cttLogicUnit.setDebugEnabled(true);
+						controlPanel.add(debugOutputTA);
+						window.setSize(new Dimension(570, 260) );
+					
+					}	// close IF
+					else
+					{	// open ELSE
+					
+						cttLogicUnit.setDebugEnabled(false);
+						controlPanel.remove(debugOutputTA);
+						window.setSize(new Dimension(570, 120) );
+						
+					}	// close ELSE
+					
+				}	// close
+				
+			});	// close ACTIONLISTENER CLASS
+			
+			// set JMenuBar on window
+			window.setJMenuBar(menuBar);
+		
+		}	// close MenuBar lebel
 	
 		JFrameEnd:
 		{	// open JFrameEnd label
 			
-			Dimension windowDim = new Dimension(570, 100);
+			Dimension windowDim = new Dimension(570, 120);
 			window.setMinimumSize(windowDim);
 			window.setPreferredSize(windowDim);
 			window.setLocationRelativeTo(null);	// centre window
@@ -231,6 +329,8 @@ public class CTTGui
 		}	// close JFrameEnd label
 		
 	}	// close CONSTRUCTOR
+	
+//***** Methods
 	
 	/**
 	 * 
@@ -272,6 +372,31 @@ public class CTTGui
 		return color;
 		
 	}	// close getConnectionColor()
+	
+	/**
+	 * 
+	 * @param input
+	 */
+	public void appendToDebugOutputTA(String input)
+	{	// open appendToDebugOutputTA()
+		
+		// clear text area
+		debugOutputTA.setText("");
+		
+		// add new debug output line to array
+		debugOutputsToAppend.add(input + "\n");
+		
+		// ensure array only contains 5 lines at a time (stop overloading of debugOutputTA)
+		if(debugOutputsToAppend.size() > 5)
+			debugOutputsToAppend.remove(0);
+			
+		// add each array element to text area 
+		// performed instead of ArrayList.toString() so as to remove [] and ,
+		for(String stringToAdd : debugOutputsToAppend)
+			debugOutputTA.append(stringToAdd);
+
+		
+	}	// close appendToDebugOutputTA()
 	
 	/**
 	 * @return details
@@ -326,6 +451,10 @@ public class CTTGui
 					// update the resultPanel with current average and associated connection color
 					statusLabel.setText("" + cttLogicUnit.getAveragePingSpeedResult());
 					resultPanel.setBackground(getConnectionColor(statusLabel) );
+					
+					// show debug info if enabled on cttLogicUnit
+					if(cttLogicUnit.getDebugEnabled())
+						appendToDebugOutputTA(cttLogicUnit.getDebugOutput());
 				
 				}	// close IF
 				
@@ -345,6 +474,11 @@ public class CTTGui
 			
 				// reset resultPanel color
 				resultPanel.setBackground(defaultColor);
+				
+				// clear debugOutputTA of text
+				debugOutputTA.setText(" ");
+				// clear debugOutputToAppend of contents
+				debugOutputsToAppend.clear();
 				
 				// enable further pings
 				startPingButton.setEnabled(true);
