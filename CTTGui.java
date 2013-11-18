@@ -56,7 +56,7 @@ public class CTTGui
 
 //***** Instance Variables
 	
-	private String versionID = "1.2";
+	private String versionID = "1.25";
 	
 	private JFrame window;
 	private JTextField enterAddressTF;
@@ -104,7 +104,7 @@ public class CTTGui
 		{	// open JFrameStart label
 		
 			window = new JFrame();
-			window.setTitle("Connectivity Test Tool");
+			window.setTitle("Connectivity Test Tool (for Windows)");
 			window.setLayout(new BorderLayout() );
 			
 			Icon:
@@ -274,7 +274,7 @@ public class CTTGui
 				public void actionPerformed(ActionEvent ae) 
 				{	// open
 					
-					JOptionPane.showMessageDialog(null, "Created by Greg Byrne, October 2013\nEmail: byrne.greg@gmail.com\nVersion: " + versionID);
+					JOptionPane.showMessageDialog(null, "Connectivity Test Tool (for Windows)\nCreated by Greg Byrne, October 2013\nEmail: byrne.greg@gmail.com\nVersion: " + versionID, "About", 1);
 					
 				}	// close	
 				

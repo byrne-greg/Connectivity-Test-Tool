@@ -1,4 +1,4 @@
-Connectivity Test Tool
+Connectivity Test Tool (for Windows)
 
 Created by Greg Byrne, October 2013
 Email: byrne.greg@gmail.com
